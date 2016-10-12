@@ -345,9 +345,9 @@ do-ip4: yes
 do-ip6: no
 do-udp: yes
 do-tcp: no
-access-control: 127.0.0.0/8 allow ## allow my server
-access-control: 10.8.0.0/24 allow ## allow OpenVPN
-access-control: 0.0.0.0/0 refuse ## no way
+access-control: 127.0.0.0/8 allow 
+access-control: 10.8.0.0/24 allow 
+access-control: 0.0.0.0/0 refuse 
 auto-trust-anchor-file: "/var/lib/unbound/root.key"
 root-hints: "/var/lib/unbound/root.hints"
 hide-identity: yes
@@ -391,7 +391,6 @@ cache-min-ttl: 3600
 cache-max-ttl: 86400
 prefetch: yes
 prefetch-keys: yes ' >> /etc/resolv.conf 
-
 		# And finally, restart Unbound
 			systemctl restart unbound
 			systemctl status unbound
@@ -435,20 +434,20 @@ tls-auth tls-auth.key 0" >> /etc/openvpn/server.conf
 		firewall-cmd --zone=trusted --add-source=10.8.0.0/24
 		firewall-cmd --permanent --zone=public --add-port=$PORT/udp
 		firewall-cmd --permanent --zone=trusted --add-source=10.8.0.0/24
-		if [[ "$FORWARD_TYPE" = '1' ]]; then
+		if [[ "$FORWARD_TYPE" = 1 ]]; then
 			firewall-cmd --zone=trusted --add-masquerade
 			firewall-cmd --permanent --zone=trusted --add-masquerade
 		fi
 	elif hash ufw 2>/dev/null && ufw status | grep -qw active; then
 		ufw allow $PORT/udp
-		if [[ "$FORWARD_TYPE" = '1' ]]; then
+		if [[ "$FORWARD_TYPE" = 1 ]]; then
 			sed -i '1s/^/##OPENVPN_START\n*nat\n:POSTROUTING ACCEPT [0:0]\n-A POSTROUTING -s 10.8.0.0\/24 -o eth0 -j MASQUERADE\nCOMMIT\n##OPENVPN_END\n\n/' /etc/ufw/before.rules
 			sed -ie 's/^DEFAULT_FORWARD_POLICY\s*=\s*/DEFAULT_FORWARD_POLICY="ACCEPT"\n#before openvpn: /' /etc/default/ufw
 		fi
 	fi
 	if iptables -L -n | grep -qE 'REJECT|DROP'; then
 		# If iptables has at least one REJECT rule, we asume this is needed.
-		# Not the best approach but I can't think of other and this shouldn't
+		# Not the best approach but I can t think of other and this shouldn't
 		# cause problems.
 		iptables -I INPUT -p udp --dport $PORT -j ACCEPT
 		iptables -I FORWARD -s 10.8.0.0/24 -j ACCEPT
@@ -531,3 +530,6 @@ tls-client" > /etc/openvpn/client-common.txt
 	echo "If you want to add more clients, you simply need to run this script another time!"
 fi
 exit 0;
+
+
+
