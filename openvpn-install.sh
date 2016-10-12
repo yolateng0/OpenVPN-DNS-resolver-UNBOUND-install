@@ -204,13 +204,9 @@ else
 	read -p "Port: " -e -i 1194 PORT
 	echo ""
 	echo "What DNS do you want to use with the VPN?"
-	echo "   1) Current system resolvers"
+	echo "   1) install your Current system resolvers"
 	echo "   2) FDN (recommended)"
-	echo "   3) OpenNIC"
-	echo "   4) DNS.WATCH"
-	echo "   5) OpenDNS"
-	echo "   6) Google"
-	read -p "DNS [1-6]: " -e -i 2 DNS
+	read -p "DNS [1-2]: " -e -i 2 DNS
 	echo ""
 	echo "Some setups (e.g. Amazon Web Services), require use of MASQUERADE rather than SNAT"
 	echo "Which forwarding method do you want to use [if unsure, leave as default]?"
@@ -257,11 +253,11 @@ else
 		fi
 		# The repo, is not available for Ubuntu 15.10 and 16.04, but it has OpenVPN > 2.3.3, so we do nothing.
 		# The we install OpnVPN
-		apt-get install openvpn iptables openssl wget ca-certificates curl -y
+		apt-get install openvpn iptables openssl wget ca-certificates curl unbound -y
 	else
 		# Else, the distro is CentOS
 		yum install epel-release -y
-		yum install openvpn iptables openssl wget ca-certificates curl -y
+		yum install openvpn iptables openssl wget ca-certificates curl unbound -y
 	fi
 	# find out if the machine uses nogroup or nobody for the permissionless group
 	if grep -qs "^nogroup:" /etc/group; then
@@ -332,6 +328,74 @@ tls-version-min 1.2" > /etc/openvpn/server.conf
 	# DNS
 	case $DNS in
 		1)
+		# Install Unbound resolver DNS local
+		# Generate server.conf
+		# Unbound configuration file for Debian.
+		# See /usr/share/doc/unbound/examples/unbound.conf for a commented
+		echo 'push
+server:
+statistics-interval: 0
+extended-statistics: yes
+statistics-cumulative: yes
+verbosity: 3
+interface: 127.0.0.1
+interface: 10.8.0.1 ## la passerelle VPN
+port: 53
+do-ip4: yes
+do-ip6: no
+do-udp: yes
+do-tcp: no
+access-control: 127.0.0.0/8 allow ## j'autorise mon serveur
+access-control: 10.8.0.0/24 allow ## j'autorise le réseau établie avec mon OpenVPN
+access-control: 0.0.0.0/0 refuse ## j'interdis tout le reste de l'Internet !
+auto-trust-anchor-file: "/var/lib/unbound/root.key"
+root-hints: "/var/lib/unbound/root.hints"
+hide-identity: yes
+hide-version: yes
+harden-glue: yes
+harden-dnssec-stripped: yes
+use-caps-for-id: yes
+cache-min-ttl: 3600
+cache-max-ttl: 86400
+prefetch: yes
+num-threads: 6
+msg-cache-slabs: 16
+rrset-cache-slabs: 16
+infra-cache-slabs: 16
+key-cache-slabs: 16
+rrset-cache-size: 256m
+msg-cache-size: 128m
+so-rcvbuf: 1m
+unwanted-reply-threshold: 10000
+do-not-query-localhost: yes
+val-clean-additional: yes
+##no ads
+local-zone: "doubleclick.net" redirect
+local-data: "doubleclick.net A 127.0.0.1"
+local-zone: "googlesyndication.com" redirect
+local-data: "googlesyndication.com A 127.0.0.1"
+local-zone: "googleadservices.com" redirect
+local-data: "googleadservices.com A 127.0.0.1"
+local-zone: "google-analytics.com" redirect
+local-data: "google-analytics.com A 127.0.0.1"
+local-zone: "ads.youtube.com" redirect
+local-data: "ads.youtube.com A 127.0.0.1"
+local-zone: "adserver.yahoo.com" redirect
+local-data: "adserver.yahoo.com A 127.0.0.1"
+local-zone: "ask.com" redirect
+local-data: "ask.com A 127.0.0.1"
+use-syslog: yes
+logfile: /var/log/unbound.log
+harden-dnssec-stripped: yes
+cache-min-ttl: 3600
+cache-max-ttl: 86400
+prefetch: yes
+prefetch-keys: yes ' >> /etc/resolv.conf 
+
+		# And finally, restart Unbound
+			systemctl restart unbound
+			systemctl status unbound
+				
 		# Obtain the resolvers from resolv.conf and use them for OpenVPN
 		grep -v '#' /etc/resolv.conf | grep 'nameserver' | grep -E -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | while read line; do
 			echo "push \"dhcp-option DNS $line\"" >> /etc/openvpn/server.conf
@@ -340,24 +404,6 @@ tls-version-min 1.2" > /etc/openvpn/server.conf
 		2) #FDN
 		echo 'push "dhcp-option DNS 80.67.169.12"' >> /etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 80.67.169.40"' >> /etc/openvpn/server.conf
-		;;
-		3) #OpenNIC
-		#Getting the nearest OpenNIC servers using the geoip API
-		read ns1 ns2 <<< $(curl -s https://api.opennicproject.org/geoip/ | head -2 | awk '{print $1}')
-		echo "push \"dhcp-option DNS $ns1\"" >> /etc/openvpn/server.conf
-		echo "push \"dhcp-option DNS $ns2\"" >> /etc/openvpn/server.conf
-		;;
-		4) #DNS.WATCH
-		echo 'push "dhcp-option DNS 84.200.69.80"' >> /etc/openvpn/server.conf
-		echo 'push "dhcp-option DNS 84.200.70.40"' >> /etc/openvpn/server.conf
-		;;
-		5) #OpenDNS
-		echo 'push "dhcp-option DNS 208.67.222.222"' >> /etc/openvpn/server.conf
-		echo 'push "dhcp-option DNS 208.67.220.220"' >> /etc/openvpn/server.conf
-		;;
-		6) #Google
-		echo 'push "dhcp-option DNS 8.8.8.8"' >> /etc/openvpn/server.conf
-		echo 'push "dhcp-option DNS 8.8.4.4"' >> /etc/openvpn/server.conf
 		;;
 	esac
 	echo "keepalive 10 120
