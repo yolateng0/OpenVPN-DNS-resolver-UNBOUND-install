@@ -428,7 +428,7 @@ tls-auth tls-auth.key 0" >> /etc/openvpn/server.conf
 		sed -i "1 a\iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE" $RCLOCAL
 	fi
 	if pgrep firewalld; then
-		# We don't use --add-service=openvpn because that would only work with
+		# We don t use --add-service=openvpn because that would only work with
 		# the default port. Using both permanent and not permanent rules to
 		# avoid a firewalld reload.
 		firewall-cmd --zone=public --add-port=$PORT/udp
