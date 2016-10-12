@@ -331,6 +331,8 @@ tls-version-min 1.2" > /etc/openvpn/server.conf
 		# Install Unbound resolver DNS local
 		# Generate server.conf
 		# Unbound configuration file for Debian.
+		cd /var/lib/unbound/ && wget https://github.com/yolateng0/DNSrootWithoutArmyDNS/blob/master/listdns.cache
+		mv listdns.cache root.hints && chown unbound:unbound root.hints
 		# See /usr/share/doc/unbound/examples/unbound.conf for a commented
 		echo 'push
 server:
