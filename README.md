@@ -16,8 +16,7 @@ This fork includes the following features :
 - Run server in unprivileged mode, reducing risks to the system
 - TLS-auth to help [thwart DoS attacks](https://openvpn.net/index.php/open-source/documentation/howto.html#security) and provide a 2nd line of defense to the TLS channel.
 - [FDN's DNS Servers](http://www.fdn.fr/actions/dns/)
-- Nearest [OpenNIC DNS Servers](https://www.opennicproject.org/)
-- [DNS.WATCH DNS Servers](https://dns.watch/index)
+- NO DNS US ARMY but DNS RESOLVER UNBOUND 10.8.0.1
 - Up-to-date OpenVPN (2.3.11) thanks to [EPEL](http://fedoraproject.org/wiki/EPEL) and [swupdate.openvpn.net](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos)
 - Support for either SNAT or MASQUERADE for forwarding
 - Every feature of the [original script](https://github.com/Nyr/openvpn-install) (I check periodically to sync the latest commits from source)
@@ -65,15 +64,12 @@ Each one has been test by myself.
 Run the script and follow the assistant:
 
 ```
-wget https://raw.githubusercontent.com/Angristan/OpenVPN-install/master/openvpn-install.sh
+wget https://github.com/yolateng0/OpenVPN-install
 chmod +x openvpn-install.sh
 ./openvpn-install.sh
 ```
 
 Once it ends, you can run it again to add more users, remove some of them or even completely uninstall OpenVPN.
-
-
-You can get a cheap VPS for 3€/month at [PulseHeberg](https://goo.gl/oBhgaj).
 
 ## Licence
 
