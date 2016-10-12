@@ -345,9 +345,9 @@ do-ip4: yes
 do-ip6: no
 do-udp: yes
 do-tcp: no
-access-control: 127.0.0.0/8 allow ## j'autorise mon serveur
-access-control: 10.8.0.0/24 allow ## j'autorise le réseau établie avec mon OpenVPN
-access-control: 0.0.0.0/0 refuse ## j'interdis tout le reste de l'Internet !
+access-control: 127.0.0.0/8 allow ## allow my server
+access-control: 10.8.0.0/24 allow ## allow OpenVPN
+access-control: 0.0.0.0/0 refuse ## no way
 auto-trust-anchor-file: "/var/lib/unbound/root.key"
 root-hints: "/var/lib/unbound/root.hints"
 hide-identity: yes
