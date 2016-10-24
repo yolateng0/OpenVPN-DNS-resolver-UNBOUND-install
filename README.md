@@ -16,7 +16,8 @@ This fork includes the following features :
 - Run server in unprivileged mode, reducing risks to the system
 - TLS-auth to help [thwart DoS attacks](https://openvpn.net/index.php/open-source/documentation/howto.html#security) and provide a 2nd line of defense to the TLS channel.
 - [FDN's DNS Servers](http://www.fdn.fr/actions/dns/)
-- NO DNS US ARMY but DNS RESOLVER UNBOUND 10.8.0.1
+- NO DNS US ARMY 
+- DNS RESOLVER UNBOUND 10.8.0.1
 - Up-to-date OpenVPN (2.3.11) thanks to [EPEL](http://fedoraproject.org/wiki/EPEL) and [swupdate.openvpn.net](https://community.openvpn.net/openvpn/wiki/OpenvpnSoftwareRepos)
 - Support for either SNAT or MASQUERADE for forwarding
 - Every feature of the [original script](https://github.com/Nyr/openvpn-install) (I check periodically to sync the latest commits from source)
