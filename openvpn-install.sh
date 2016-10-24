@@ -327,8 +327,7 @@ tls-version-min 1.2" > /etc/openvpn/server.conf
 	echo 'push "redirect-gateway def1 bypass-dhcp"' >> /etc/openvpn/server.conf
 	# DNS
 	case $DNS in
-		1)
-		# Install Unbound resolver DNS local
+		1)# Install Unbound resolver DNS local
 		# Generate server.conf
 		# Unbound configuration file for Debian.
 		cd /var/lib/unbound/ && wget https://github.com/yolateng0/DNSrootWithoutArmyDNS/blob/master/listdns.cache
@@ -392,7 +391,7 @@ harden-dnssec-stripped: yes
 cache-min-ttl: 3600
 cache-max-ttl: 86400
 prefetch: yes
-prefetch-keys: yes" ' >> /etc/resolv.conf 
+prefetch-keys: yes" ' >> /etc/unbound/unbound.conf
 		# And finally, restart Unbound
 			systemctl restart unbound
 			systemctl status unbound
