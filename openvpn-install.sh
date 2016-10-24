@@ -335,7 +335,7 @@ tls-version-min 1.2" > /etc/openvpn/server.conf
 		mv listdns.cache root.hints && chown unbound:unbound root.hints
 		# See /usr/share/doc/unbound/examples/unbound.conf for a commented
 		echo 'push
-server:
+"server:
 statistics-interval: 0
 extended-statistics: yes
 statistics-cumulative: yes
@@ -392,7 +392,7 @@ harden-dnssec-stripped: yes
 cache-min-ttl: 3600
 cache-max-ttl: 86400
 prefetch: yes
-prefetch-keys: yes ' >> /etc/resolv.conf 
+prefetch-keys: yes" ' >> /etc/resolv.conf 
 		# And finally, restart Unbound
 			systemctl restart unbound
 			systemctl status unbound
@@ -484,7 +484,7 @@ tls-auth tls-auth.key 0" >> /etc/openvpn/server.conf
 			systemctl enable openvpn@server.service
 		else
 			service openvpn restart
-			chkconfig openvpn on
+			chkconfig openvpn onresolve.conf update
 		fi
 	fi
 	# Try to detect a NATed connection and ask about it to potential LowEndSpirit/Scaleway users
