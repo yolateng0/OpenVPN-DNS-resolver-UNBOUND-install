@@ -46,7 +46,7 @@ Features :
 
 ## Compatibility
 
-The script is made to work on these OS :
+The script is made normaly to work on these OS :
 - Debian 7
 - Debian 8
 - Ubuntu 12.04 LTS
@@ -55,8 +55,6 @@ The script is made to work on these OS :
 - Ubuntu 16.04 LTS
 - CentOS 6
 - CentOS 7
-
-Each one has been test by myself.
 
 ##Installation
 
