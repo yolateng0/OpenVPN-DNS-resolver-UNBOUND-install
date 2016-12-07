@@ -72,6 +72,6 @@ Once it ends, you can run it again to add more users, remove some of them or eve
 
 ## Licence
 
-Based on the work of [Nyr](https://github.com/Nyr/openvpn-install)
+Based on the work of [Nyr](https://github.com/Nyr/openvpn-install) [Angristan](https://github.com/Angristan/)
 
 [MIT Licence](https://raw.githubusercontent.com/Angristan/openvpn-install-nyr/master/LICENSE)
