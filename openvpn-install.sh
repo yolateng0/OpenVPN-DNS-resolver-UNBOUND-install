@@ -1,10 +1,10 @@
 #!/bin/bash
-# OpenVPN road warrior installer for Debian, Ubuntu and CentOS
+# OpenVPN road warrior installer for Debian, Ubuntu, CentOS and ArchLinux.
 
-# This script will work on Debian, Ubuntu, CentOS and probably other distros
+# This script will work on Debian, Ubuntu, CentOS, Arch and probably other distros
 # of the same families, although no support is offered for them. It isn't
 # bulletproof but it will probably work if you simply want to setup a VPN on
-# your Debian/Ubuntu/CentOS box. It has been designed to be as unobtrusive and
+# your Debian/Ubuntu/CentOS/Arch box. It has been designed to be as unobtrusive and
 # universal as possible.
 
 
@@ -39,8 +39,16 @@ elif [[ -e /etc/centos-release || -e /etc/redhat-release ]]; then
 	RCLOCAL='/etc/rc.d/rc.local'
 	# Needed for CentOS 7
 	chmod +x /etc/rc.d/rc.local
+	# Needed for Arch
+elif [[ -e /etc/arch-release ]]; then
+	OS=arch
+	GROUPNAME=nobody
+	RCLOCAL='/etc/iptables/iptables.rules'
+	if [[ ! -e RCLOCAL ]]; then
+		touch $RCLOCAL
+	fi
 else
-	echo "Looks like you aren't running this installer on a Debian, Ubuntu or CentOS system"
+	echo "Looks like you aren't running this installer on a Debian, Ubuntu, CentOS an Arch system"
 	exit 4
 fi
 
@@ -162,9 +170,10 @@ if [[ -e /etc/openvpn/server.conf ]]; then
 				fi
 				if [[ "$OS" = 'debian' ]]; then
 					apt-get remove --purge -y openvpn openvpn-blacklist
-				else
-					yum remove openvpn -y
-				fi
+				elif [[ "$OS" = 'centos' ]]; then
+ 					yum remove openvpn -y
++				elif [[ "$OS" = 'arch' ]]; then
++					pacman -R --noconfirm openvpn
 				rm -rf /etc/openvpn
 				rm -rf /usr/share/doc/openvpn*
 				echo ""
@@ -258,7 +267,10 @@ else
 		# Else, the distro is CentOS
 		yum install epel-release -y
 		yum install openvpn iptables openssl wget ca-certificates curl unbound -y
-	fi
+		# Else, the distro is Arch
+		elif [[ "$OS" = 'arch' ]]; then
++		pacman -S openvpn iptables openssl wget unbound ca-certificates-{cacert,mozilla,utils} --needed --noconfirm
+		fi
 	# find out if the machine uses nogroup or nobody for the permissionless group
 	if grep -qs "^nogroup:" /etc/group; then
 	        NOGROUP=nogroup
